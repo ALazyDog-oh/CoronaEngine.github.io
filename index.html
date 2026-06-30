@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>3D 互动体验 - 团队主页</title>
     <style>
-        /* 基础重置 */
+        /* ==========================================
+           1. 基础重置与 UI 顶层
+           ========================================== */
         body, html {
             margin: 0;
             padding: 0;
@@ -24,7 +26,6 @@
             z-index: 1;
         }
 
-        /* UI 顶层容器 */
         #ui-layer {
             position: absolute;
             top: 0;
@@ -35,7 +36,6 @@
             pointer-events: none;
         }
 
-        /* 页面基础样式 */
         .page {
             position: absolute;
             top: 0;
@@ -61,24 +61,9 @@
             transform: translateY(-80px);
         }
 
-        /* 文字与按钮样式 */
-        .overline {
-            font-size: 0.85rem;
-            color: #888;
-            letter-spacing: 0.3em;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            text-transform: uppercase;
-        }
-        .overline::before {
-            content: "";
-            display: inline-block;
-            width: 40px;
-            height: 1px;
-            background-color: #ffb703;
-            margin-right: 15px;
-        }
+        /* ==========================================
+           2. 首屏 (Page 0) 样式
+           ========================================== */
         .title {
             font-size: 5.5rem;
             font-weight: 800;
@@ -96,245 +81,332 @@
             max-width: 600px;
         }
         .btn-group { margin-top: 40px; display: flex; gap: 20px; }
-        .btn { padding: 16px 32px; font-size: 0.9rem; font-weight: 600; letter-spacing: 0.1em; text-decoration: none; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; }
-        .btn-primary { background-color: #ffb703; color: #000; border: 1px solid #ffb703; }
-        .btn-primary:hover { background-color: #ffc233; box-shadow: 0 0 20px rgba(255, 183, 3, 0.4); }
-        .btn-secondary { background-color: transparent; color: #fff; border: 1px solid rgba(255, 255, 255, 0.3); }
-        .btn-secondary:hover { border-color: #fff; background-color: rgba(255, 255, 255, 0.05); }
+        .btn { 
+            padding: 14px 32px; font-size: 1rem; font-weight: 600; letter-spacing: 0.05em; 
+            text-decoration: none; cursor: pointer; transition: all 0.3s ease; 
+            display: inline-flex; align-items: center; justify-content: center; 
+            gap: 10px; border-radius: 50px; 
+        }
+        .btn svg { width: 20px; height: 20px; fill: currentColor; }
+        .btn-primary { background-color: #fcb015; color: #111; border: 1px solid #fcb015; }
+        .btn-primary:hover { background-color: #ffd15c; border-color: #ffd15c; box-shadow: 0 0 20px rgba(252, 176, 21, 0.4); }
+        .btn-secondary { background-color: rgba(255, 255, 255, 0.1); color: #fff; border: 1px solid rgba(255, 255, 255, 0.35); backdrop-filter: blur(4px); }
+        .btn-secondary:hover { border-color: #fff; background-color: rgba(255, 255, 255, 0.2); }
 
+        /* 侧边导航 */
         .pagination { position: absolute; right: 40px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 15px; pointer-events: auto; }
         .dot { width: 8px; height: 8px; border-radius: 50%; background-color: rgba(255,255,255,0.2); cursor: pointer; transition: all 0.3s ease; }
         .dot.active { background-color: #ffb703; box-shadow: 0 0 10px #ffb703; transform: scale(1.5); }
 
         /* ==========================================
-           【Page 3】团队排版样式 (电影字幕风格)
+           3. 核心业务 (Page 1) - Bento 网格与身份切换
            ========================================== */
-        .credits-container {
-            margin-top: 40px;
-            display: flex;
-            flex-direction: column;
-            gap: 45px;
-            width: 100%;
-            max-width: 800px;
+        #page-1 { align-items: center; text-align: center; }
+        
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            letter-spacing: 2px;
+            background: linear-gradient(90deg, #fff, #b0b0b0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        .credit-row {
+        /* 身份切换器 */
+        .role-switch {
+            display: inline-flex;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 40px;
+            padding: 5px;
+            margin-bottom: 40px;
+            backdrop-filter: blur(10px);
+        }
+        .role-btn {
+            padding: 10px 30px;
+            border-radius: 35px;
+            border: none;
+            background: transparent;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.4s ease;
             display: flex;
-            flex-wrap: wrap;
-            align-items: baseline;
+            align-items: center;
+            gap: 8px;
+        }
+        .role-btn svg { width: 18px; height: 18px; fill: currentColor; }
+        .role-btn.active {
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Bento 网格容器 */
+        .bento-grid {
+            display: none; /* 默认隐藏，通过JS控制显示 */
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            width: 100%;
+            max-width: 1000px;
+        }
+        .bento-grid.active { display: grid; }
+
+        /* 独立的卡片样式 */
+        .bento-card {
+            background: linear-gradient(145deg, rgba(30, 30, 35, 0.6) 0%, rgba(15, 15, 20, 0.8) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
         }
         
+        .bento-card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 50% 0%, rgba(255,255,255,0.05) 0%, transparent 60%);
+            opacity: 0; transition: opacity 0.4s;
+        }
+
+        .bento-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), 0 0 20px rgba(0, 243, 255, 0.1);
+        }
+        .bento-card:hover::before { opacity: 1; }
+
+        /* 大卡片独占跨度 */
+        .bento-card.large {
+            grid-column: span 1;
+            grid-row: span 2;
+            justify-content: flex-start;
+            padding-top: 50px;
+        }
+
+        .bento-icon {
+            width: 48px; height: 48px;
+            margin-bottom: 20px;
+            color: #00f3ff;
+            transition: transform 0.4s;
+        }
+        .bento-card.large .bento-icon { width: 64px; height: 64px; color: #ff0066; }
+        .bento-card:hover .bento-icon { transform: scale(1.1); }
+
+        .bento-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #fff;
+            margin: 0;
+            text-align: center;
+        }
+
+        /* 点击展开内容的魔法核心：Grid 动画 */
+        .bento-content-wrapper {
+            display: grid;
+            grid-template-rows: 0fr;
+            transition: grid-template-rows 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+            width: 100%;
+        }
+        .bento-desc {
+            overflow: hidden;
+            font-size: 0.9rem;
+            color: #aaa;
+            line-height: 1.6;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        /* 激活展开状态 */
+        .bento-card.open {
+            background: linear-gradient(145deg, rgba(40, 40, 45, 0.8) 0%, rgba(20, 20, 25, 0.9) 100%);
+            border-color: rgba(0, 243, 255, 0.3);
+        }
+        .bento-card.open .bento-content-wrapper { grid-template-rows: 1fr; margin-top: 15px; }
+        .bento-card.open .bento-desc { opacity: 1; padding-top: 5px; }
+
+
+        /* ==========================================
+           4. 其他原有的页面样式 (History, Team, etc.)
+           ========================================== */
+        .overline { font-size: 0.85rem; color: #888; letter-spacing: 0.3em; margin-bottom: 20px; display: flex; align-items: center; text-transform: uppercase; }
+        .overline::before { content: ""; display: inline-block; width: 40px; height: 1px; background-color: #ffb703; margin-right: 15px; }
+        
+        /* Team Page */
+        .credits-container { margin-top: 40px; display: flex; flex-direction: column; gap: 45px; width: 100%; max-width: 800px; }
+        .credit-row { display: flex; flex-wrap: wrap; align-items: baseline; }
         .row-founders { justify-content: flex-start; gap: 40px; border-left: 2px solid #00f3ff; padding-left: 20px; }
         .row-core { justify-content: flex-end; gap: 35px; padding-right: 15%; }
         .row-rnd { justify-content: center; gap: 25px; padding-left: 10%; padding-right: 10%; }
-
-        .member {
-            position: relative;
-            cursor: pointer;
-            display: inline-block;
-        }
-
-        .member .name {
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-            letter-spacing: 2px;
-            transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-        }
-
+        .member { position: relative; cursor: pointer; display: inline-block; }
+        .member .name { font-family: 'Helvetica Neue', Arial, sans-serif; letter-spacing: 2px; transition: all 0.4s; }
         .row-founders .name { font-size: 2.2rem; font-weight: 700; color: rgba(255, 255, 255, 0.95); }
         .row-core .name { font-size: 1.4rem; font-weight: 500; color: rgba(255, 255, 255, 0.75); }
         .row-rnd .name { font-size: 1.05rem; font-weight: 300; color: rgba(255, 255, 255, 0.5); }
+        .member:hover .name { color: #00f3ff; text-shadow: 0 0 15px rgba(0, 243, 255, 0.8); transform: scale(1.05); }
+        .member .role { position: absolute; top: -28px; left: 50%; transform: translateX(-50%) translateY(10px); opacity: 0; font-size: 0.8rem; color: #ff0066; white-space: nowrap; pointer-events: none; transition: all 0.3s; font-weight: 600; }
+        .member:hover .role { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-        .member:hover .name {
-            color: #00f3ff;
-            text-shadow: 0 0 15px rgba(0, 243, 255, 0.8);
-            transform: scale(1.05);
-        }
-
-        .member .role {
-            position: absolute;
-            top: -28px;
-            left: 50%;
-            transform: translateX(-50%) translateY(10px);
-            opacity: 0;
-            font-size: 0.8rem;
-            color: #ff0066;
-            white-space: nowrap;
-            pointer-events: none;
-            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-            letter-spacing: 1px;
-            font-weight: 600;
-        }
-        
-        .member:hover .role {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-        }
-
-        /* ==========================================
-           【Page 4】学术成果与专利墙排版
-           ========================================== */
-        .academic-layout {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-top: 40px;
-            width: 100%;
-            max-width: 1050px;
-            gap: 60px;
-        }
-
-        /* --- 左侧：核心论文 --- */
-        .paper-list {
-            flex: 1.2;
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
-        }
-
-        .paper-item {
-            position: relative;
-            padding-left: 20px;
-            border-left: 2px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-            cursor: pointer;
-        }
-
-        .paper-item:hover {
-            border-left-color: #ff0066;
-            transform: translateX(12px);
-            background: linear-gradient(90deg, rgba(255,0,102,0.05) 0%, transparent 100%);
-        }
-
-        .paper-title {
-            font-size: 1.05rem;
-            font-weight: 500;
-            color: rgba(255, 255, 255, 0.85);
-            margin-bottom: 10px;
-            line-height: 1.4;
-            transition: color 0.3s;
-        }
-
-        .paper-item:hover .paper-title {
-            color: #fff;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-        }
-
-        .paper-meta {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 0.75rem;
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-        }
-
-        .badge {
-            padding: 3px 8px;
-            border-radius: 2px;
-            font-weight: 700;
-            letter-spacing: 1px;
-        }
+        /* Academic Page */
+        .academic-layout { display: flex; justify-content: space-between; align-items: flex-start; margin-top: 40px; width: 100%; max-width: 1050px; gap: 60px; }
+        .paper-list { flex: 1.2; display: flex; flex-direction: column; gap: 25px; }
+        .paper-item { position: relative; padding-left: 20px; border-left: 2px solid rgba(255, 255, 255, 0.1); transition: all 0.4s; cursor: pointer; }
+        .paper-item:hover { border-left-color: #ff0066; transform: translateX(12px); background: linear-gradient(90deg, rgba(255,0,102,0.05) 0%, transparent 100%); }
+        .paper-title { font-size: 1.05rem; font-weight: 500; color: rgba(255, 255, 255, 0.85); margin-bottom: 10px; line-height: 1.4; transition: color 0.3s; }
+        .paper-item:hover .paper-title { color: #fff; text-shadow: 0 0 10px rgba(255, 255, 255, 0.3); }
+        .paper-meta { display: flex; align-items: center; gap: 12px; font-size: 0.75rem; }
+        .badge { padding: 3px 8px; border-radius: 2px; font-weight: 700; letter-spacing: 1px; }
         .badge.sci { background: rgba(0, 243, 255, 0.1); color: #00f3ff; border: 1px solid rgba(0, 243, 255, 0.3); }
         .badge.conf { background: rgba(255, 0, 102, 0.1); color: #ff0066; border: 1px solid rgba(255, 0, 102, 0.3); }
         .badge.ei { background: rgba(255, 183, 3, 0.1); color: #ffb703; border: 1px solid rgba(255, 183, 3, 0.3); }
         .paper-author { color: #888; }
-/* --- 右侧：专利星云 --- */
-.patent-wall {
-    flex: 0.8;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px; /* 稍微收紧间距 */
-    align-content: flex-start;
-    padding-top: 5px;
-    
-    /* 【新增排版魔法】：限制高度、开启滚动、并羽化边缘 */
-    max-height: 360px; /* 限制视窗高度，避免挤压下方空间 */
-    overflow-y: auto;
-    padding-right: 15px; /* 为滚动条留出呼吸空间 */
-    padding-bottom: 40px; /* 给底部羽化过渡留出余量 */
-    
-    /* 核心视觉：使用线性渐变作为蒙版，让底部数据平滑隐去 */
-    -webkit-mask-image: linear-gradient(to bottom, #000 75%, transparent 100%);
-    mask-image: linear-gradient(to bottom, #000 75%, transparent 100%);
-}
-
-/* 定制赛博质感的极简滚动条 */
-.patent-wall::-webkit-scrollbar {
-    width: 3px; /* 极细，不抢视觉 */
-}
-.patent-wall::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.02);
-    border-radius: 3px;
-}
-.patent-wall::-webkit-scrollbar-thumb {
-    background: rgba(0, 243, 255, 0.2); /* 默认微光 */
-    border-radius: 3px;
-    transition: background 0.3s;
-}
-.patent-wall:hover::-webkit-scrollbar-thumb {
-    background: rgba(0, 243, 255, 0.7); /* 悬停时激活高亮 */
-    box-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
-}
-
-.patent-item {
-    font-size: 0.75rem; /* 适当减小字号，增加精致感 */
-    color: rgba(255, 255, 255, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    padding: 6px 12px; /* 减小内边距，使胶囊更秀气 */
-    border-radius: 15px;
-    cursor: crosshair;
-    transition: color 0.3s, background 0.3s, border-color 0.3s, box-shadow 0.3s, font-weight 0.3s;
-    background: rgba(255, 255, 255, 0.01);
-    white-space: nowrap;
-    animation: float 4s ease-in-out infinite;
-}
-
-/* 错落的动画延迟 */
-.patent-item:nth-child(even) { animation-delay: -1.5s; transform-origin: center; }
-.patent-item:nth-child(3n) { animation-delay: -2.8s; }
-.patent-item:nth-child(5n) { animation-delay: -0.5s; }
-
-@keyframes float {
-    0%, 100% { transform: translateY(0) scale(1); }
-    50% { transform: translateY(-5px) scale(1.02); }
-}
-
-.patent-item:hover {
-    color: #030305;
-    background: #00f3ff;
-    border-color: #00f3ff;
-    box-shadow: 0 0 15px rgba(0, 243, 255, 0.5);
-    font-weight: 600;
-    z-index: 10;
-    animation-play-state: paused; 
-    transform: scale(1.08) translateY(0) !important; 
-}
+        
+        .patent-wall { flex: 0.8; display: flex; flex-wrap: wrap; gap: 10px; align-content: flex-start; padding-top: 5px; max-height: 360px; overflow-y: auto; padding-right: 15px; padding-bottom: 40px; mask-image: linear-gradient(to bottom, #000 75%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, #000 75%, transparent 100%); }
+        .patent-wall::-webkit-scrollbar { width: 3px; }
+        .patent-wall::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.02); border-radius: 3px; }
+        .patent-wall::-webkit-scrollbar-thumb { background: rgba(0, 243, 255, 0.2); border-radius: 3px; transition: background 0.3s; }
+        .patent-wall:hover::-webkit-scrollbar-thumb { background: rgba(0, 243, 255, 0.7); box-shadow: 0 0 10px rgba(0, 243, 255, 0.5); }
+        .patent-item { font-size: 0.75rem; color: rgba(255, 255, 255, 0.3); border: 1px solid rgba(255, 255, 255, 0.05); padding: 6px 12px; border-radius: 15px; cursor: crosshair; transition: all 0.3s; background: rgba(255, 255, 255, 0.01); white-space: nowrap; animation: float 4s ease-in-out infinite; }
+        .patent-item:nth-child(even) { animation-delay: -1.5s; transform-origin: center; }
+        .patent-item:nth-child(3n) { animation-delay: -2.8s; }
+        .patent-item:nth-child(5n) { animation-delay: -0.5s; }
+        @keyframes float { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-5px) scale(1.02); } }
+        .patent-item:hover { color: #030305; background: #00f3ff; border-color: #00f3ff; box-shadow: 0 0 15px rgba(0, 243, 255, 0.5); font-weight: 600; z-index: 10; animation-play-state: paused; transform: scale(1.08) translateY(0) !important; }
     </style>
 </head>
 <body>
 
     <div id="ui-layer">
+        
+        <!-- ================= PAGE 0: 首屏 ================= -->
         <div class="page active" id="page-0">
-            <div class="overline">Welcome</div>
             <h1 class="title">探索无界</h1>
             <p class="subtitle">致力于前沿学术研究与技术创新。<br>以星辰大海为征途，连接每一次智慧的闪烁。</p>
             <div class="btn-group">
-                <a href="#" class="btn btn-primary" onclick="goToPage(1); return false;">↓ 深入了解</a>
-                <a href="#" class="btn btn-secondary">联系我们</a>
+                <a href="#" class="btn btn-primary">
+                    <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                    立即下载
+                </a>
+                <a href="#" class="btn btn-secondary">
+                    <svg viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.379.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.161 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>
+                    获取开源代码 (MIT协议)
+                </a>
             </div>
         </div>
         
+        <!-- ================= PAGE 1: 核心业务 (全新结构) ================= -->
         <div class="page" id="page-1">
-            <div class="overline">Features & Introduction</div>
-            <h1 class="title">核心业务</h1>
-            <p class="subtitle">聚焦人工智能与计算机图形学交叉领域。<br>打造高效、智能的解决方案，推动行业技术变革。</p>
+            <h2 class="section-title">面向科研的深度，面向创作的自由</h2>
+            
+            <!-- 切换开关 -->
+            <div class="role-switch">
+                <button class="role-btn active" onclick="switchRole('creator', event)">
+                    <svg viewBox="0 0 24 24"><path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm-1-11v6h2v-6h-2zm0-4v2h2V7h-2z"/></svg>
+                    我是创作者
+                </button>
+                <button class="role-btn" onclick="switchRole('developer', event)">
+                    <svg viewBox="0 0 24 24"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg>
+                    我是开发者
+                </button>
+            </div>
+
+            <!-- 数据集 1: 创作者网格 -->
+            <div class="bento-grid active" id="grid-creator">
+                <div class="bento-card large" onclick="toggleCard(this)">
+                    <svg class="bento-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M7.5 5.6L10 7 8.6 4.5 10 2 7.5 3.4 5 2l1.4 2.5L5 7l2.5-1.4zM19.5 15.4L22 14l-1.4 2.5L22 19l-2.5-1.4L17 19l1.4-2.5L17 14l2.5 1.4zM22 2l-2.5 1.4L17 2l1.4 2.5L17 7l2.5-1.4L22 7l-1.4-2.5L22 2zm-7.63 5.29c-.39-.39-1.02-.39-1.41 0L1.29 18.96c-.39.39-.39 1.02 0 1.41l2.34 2.34c.39.39 1.02.39 1.41 0L16.7 11.05c.39-.39.39-1.02 0-1.41l-2.33-2.35zm-1.03 5.49l-2.12-2.12 2.44-2.44 2.12 2.12-2.44 2.44z"/></svg>
+                    <h3 class="bento-title">零基础创作沙盒</h3>
+                    <div class="bento-content-wrapper">
+                        <div class="bento-desc">告别传统繁杂的引擎面板，无论你是懂技术不懂美术，还是懂美术不懂代码，只需带上灵感，就能在这里轻松拼搭出心中的游戏世界。</div>
+                    </div>
+                </div>
+                <div class="bento-card" onclick="toggleCard(this)">
+                    <svg class="bento-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 11H19V7c0-1.1-.9-2-2-2h-4V3.5C13 2.12 11.88 1 10.5 1S8 2.12 8 3.5V5H4c-1.1 0-1.99.9-1.99 2v3.8H3.5c1.49 0 2.7 1.21 2.7 2.7s-1.21 2.7-2.7 2.7H2V20c0 1.1.9 2 2 2h3.8v-1.5c0-1.49 1.21-2.7 2.7-2.7 1.49 0 2.7 1.21 2.7 2.7V22H17c1.1 0 2-.9 2-2v-4h1.5c1.38 0 2.5-1.12 2.5-2.5S21.88 11 20.5 11z"/></svg>
+                    <h3 class="bento-title">积木式编程</h3>
+                    <div class="bento-content-wrapper">
+                        <div class="bento-desc">用直观的逻辑模块代替生涩代码，所见即所得。大幅降低学习曲线，让创意不再被语法限制。</div>
+                    </div>
+                </div>
+                <div class="bento-card" onclick="toggleCard(this)">
+                    <svg class="bento-icon" style="color:#eebbff" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 18a8 8 0 110-16 8 8 0 010 16zm1-13h-2v4H7v2h4v4h2v-4h4V9h-4V7z"/></svg>
+                    <h3 class="bento-title">AI 场景助手</h3>
+                    <div class="bento-content-wrapper">
+                        <div class="bento-desc">基于大模型的智能化辅助构建，一句自然语言指令，即可生成精美场景，大幅降低搭建的时间成本。</div>
+                    </div>
+                </div>
+                <div class="bento-card" onclick="toggleCard(this)">
+                    <svg class="bento-icon" style="color:#ffccaa" viewBox="0 0 24 24" fill="currentColor"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/></svg>
+                    <h3 class="bento-title">零门槛生态</h3>
+                    <div class="bento-content-wrapper">
+                        <div class="bento-desc">专为学生与初学者打造，内置海量开源预设组件库，让创意落地不再被技术壁垒阻挡。</div>
+                    </div>
+                </div>
+                <div class="bento-card" onclick="toggleCard(this)">
+                    <svg class="bento-icon" style="color:#aaffff" viewBox="0 0 24 24" fill="currentColor"><path d="M21 3H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h5v2h8v-2h5c1.1 0 1.99-.9 1.99-2L23 5c0-1.1-.9-2-2-2zm0 14H3V5h18v12z"/></svg>
+                    <h3 class="bento-title">前沿显示支持</h3>
+                    <div class="bento-content-wrapper">
+                        <div class="bento-desc">深度集成并优化立体显示技术，打破次元壁，赋能下一代沉浸式视觉体验。</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 数据集 2: 开发者网格 -->
+            <div class="bento-grid" id="grid-developer">
+                <div class="bento-card large" onclick="toggleCard(this)">
+                    <svg class="bento-icon" style="color:#00f3ff" viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zM4 18V6h16v12H4zm6.5-5.5L12 11l-1.5-1.5L9 11l-1.5-1.5L6 11l1.5 1.5L6 14l1.5 1.5L9 14l1.5 1.5L12 14l-1.5-1.5zm5.5 1.5h-4v1h4v-1zm0-3h-4v1h4v-1z"/></svg>
+                    <h3 class="bento-title">CPU-GPU 异构协同</h3>
+                    <div class="bento-content-wrapper">
+                        <div class="bento-desc">底层采用全新调度架构，在异构编程语言领域取得实质性突破，智能分配计算任务，释放极致算力，让实时渲染帧率突破极限。</div>
+                    </div>
+                </div>
+                <div class="bento-card" onclick="toggleCard(this)">
+                    <svg class="bento-icon" style="color:#ffccaa" viewBox="0 0 24 24" fill="currentColor"><path d="M15 4v8h5.5l-6.5 7v-8H8.5L15 4z"/></svg>
+                    <h3 class="bento-title">跨模态神经渲染</h3>
+                    <div class="bento-content-wrapper">
+                        <div class="bento-desc">集成最新学术研究成果，支持文本、图像与 3D 拓扑数据的跨模态转换，加速数字孪生场景的构建过程。</div>
+                    </div>
+                </div>
+                <div class="bento-card" onclick="toggleCard(this)">
+                    <svg class="bento-icon" style="color:#ff0066" viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.06-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.73 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.06.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .43-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.49-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+                    <h3 class="bento-title">高度可扩展 API</h3>
+                    <div class="bento-content-wrapper">
+                        <div class="bento-desc">为 SIGGRAPH 等前沿学术研究提供透明、可修改的底层接口，开发者可完全自定义渲染管线与物理反馈系统。</div>
+                    </div>
+                </div>
+                <div class="bento-card" onclick="toggleCard(this)">
+                    <svg class="bento-icon" style="color:#aaffff" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+                    <h3 class="bento-title">全链路性能分析</h3>
+                    <div class="bento-content-wrapper">
+                        <div class="bento-desc">内置微秒级性能探针，支持从 Draw Call 提交到显存调度的全方位数据监控，精准定位性能瓶颈。</div>
+                    </div>
+                </div>
+                <div class="bento-card" onclick="toggleCard(this)">
+                    <svg class="bento-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
+                    <h3 class="bento-title">企业级数据安全</h3>
+                    <div class="bento-content-wrapper">
+                        <div class="bento-desc">支持本地私有化部署方案，核心代码与素材全链路加密，保障团队协作时的数字资产绝对安全。</div>
+                    </div>
+                </div>
+            </div>
         </div>
         
+        <!-- ================= PAGE 2: 发展历程 ================= -->
         <div class="page" id="page-2">
             <div class="overline">Our History</div>
             <h1 class="title">发展历程</h1>
             <p class="subtitle">从初创时的极客团队，到如今屡获殊荣的研究中心。<br>每一步跨越都踏实坚定，用代码丈量时代的进步。</p>
         </div>
         
+        <!-- ================= PAGE 3: 团队力量 ================= -->
         <div class="page" id="page-3">
             <div class="overline">Our Team</div>
             <h1 class="title" style="font-size: 3.5rem; margin-bottom: -10px;">团队力量</h1>
@@ -344,14 +416,12 @@
                     <div class="member"><span class="role">资深工程师 / 硕导</span><span class="name">Zero</span></div>
                     <div class="member"><span class="role">企业CTO / 硕导</span><span class="name">邹刘磊</span></div>
                 </div>
-
                 <div class="credit-row row-core">
                     <div class="member"><span class="role">核心成员</span><span class="name">徐安琦</span></div>
                     <div class="member"><span class="role">核心成员</span><span class="name">李昊</span></div>
                     <div class="member"><span class="role">核心成员</span><span class="name">吴学杰</span></div>
                     <div class="member"><span class="role">核心成员</span><span class="name">Royalvice</span></div>
                 </div>
-
                 <div class="credit-row row-rnd">
                     <div class="member"><span class="role">研发工程师</span><span class="name">陈宇轩</span></div>
                     <div class="member"><span class="role">研发工程师</span><span class="name">林子墨</span></div>
@@ -367,6 +437,7 @@
             </div>
         </div>
 
+        <!-- ================= PAGE 4: 学术成果 ================= -->
         <div class="page" id="page-4">
             <div class="overline">Academic Publications & Patents</div>
             <h1 class="title" style="font-size: 3.5rem;">学术成果</h1>
@@ -430,6 +501,7 @@
             </div>
         </div>
 
+        <!-- ================= PAGE 5: 竞赛 ================= -->
         <div class="page" id="page-5">
             <div class="overline">Competitions</div>
             <h1 class="title">相关竞赛</h1>
@@ -439,6 +511,7 @@
             </div>
         </div>
 
+        <!-- 全局侧边导航 -->
         <div class="pagination" id="pagination">
             <div class="dot active" onclick="goToPage(0)"></div>
             <div class="dot" onclick="goToPage(1)"></div>
@@ -449,9 +522,41 @@
         </div>
     </div>
 
+    <!-- ================= 核心脚本区 ================= -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
     <script>
+        // ==========================================
+        // UI 交互逻辑 (身份切换与卡片展开)
+        // ==========================================
+        function switchRole(role, event) {
+            // 更新按钮状态
+            const buttons = document.querySelectorAll('.role-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+
+            // 切换网格显示
+            document.getElementById('grid-creator').classList.remove('active');
+            document.getElementById('grid-developer').classList.remove('active');
+            
+            if (role === 'creator') {
+                document.getElementById('grid-creator').classList.add('active');
+            } else {
+                document.getElementById('grid-developer').classList.add('active');
+            }
+        }
+
+        function toggleCard(cardElement) {
+            // 如果想实现手风琴效果（点开一个关闭其他），解除下面这段注释
+            /*
+            const siblings = cardElement.parentElement.querySelectorAll('.bento-card');
+            siblings.forEach(sibling => {
+                if(sibling !== cardElement) sibling.classList.remove('open');
+            });
+            */
+            cardElement.classList.toggle('open');
+        }
+
         // ==========================================
         // 1. 页面滚动逻辑
         // ==========================================
